@@ -39,7 +39,7 @@ function runTest (basename: string, numberToRemove: number): void {
   const transformedNaked = transform(source, {stage: 0});
   //console.log(transformedNaked.code);
   const transformedWithPlugin = transform(source, {stage: 0, plugins: [Plugin]});
-  // console.log(transformedWithPlugin.code);
+  //console.log(transformedWithPlugin.code);
   const diff = countHoisted(transformedNaked.ast, transformedWithPlugin.ast);
   diff.should.equal(numberToRemove);
 }
@@ -76,6 +76,7 @@ function extractPath (scope) {
 describe('Closure Elimination', function () {
   eliminate("simple", 1);
   eliminate("twice", 2);
+  eliminate("complex", 14);
   eliminate("inner-1", 2);
   eliminate("no-hoist", 0);
   eliminate("inner-2", 3);
