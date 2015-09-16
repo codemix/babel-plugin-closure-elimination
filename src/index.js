@@ -117,10 +117,10 @@ export default function build (babel: Object): Object {
       }
 
       if (node.type === 'FunctionDeclaration') {
-        let uid = this.path.parentPath.scope.generateUidBasedOnNode(node.id);
+        let uid = this.path.parentPath.scope.generateUidIdentifierBasedOnNode(node.id);
         this.path.parentPath.scope.rename(node.id.name, uid.name);
         path.insertBefore([node]);
-        this.path.remove();
+        this.path.dangerouslyRemove();
       }
       else {
         const uid = path.scope.generateUidIdentifier("ref");
