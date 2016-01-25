@@ -11,9 +11,10 @@ function load (basename) {
 function collectPositions (ast: Object): Object {
   const collected = {};
   traverse(ast, {
-    enter (node: Object, parent: Object) {
-      if (this.isFunction()) {
-        collected[JSON.stringify(node.loc)] = extractPath(this.scope);
+    enter (path) {
+      const node = path.node;
+      if (path.isFunction()) {
+        collected[JSON.stringify(node.loc)] = extractPath(path.scope);
       }
     }
   });

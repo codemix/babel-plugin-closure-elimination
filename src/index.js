@@ -2,13 +2,15 @@
  * # Closure Eliminator
  */
 export default function build (babel: Object): Object {
-  const {Transformer, types: t, traverse} = babel;
+  const {types: t, traverse} = babel;
 
   const referenceVisitor = {
-    enter (node, parent, scope, state) {
-      if (!this.isJSXIdentifier() && this.isIdentifier()) {
+    enter (path, state) {
+      const node = path.node,
+        scope = path.scope;
+      if (!path.isJSXIdentifier() && path.isIdentifier()) {
         // direct references that we need to track to hoist this to the highest scope we can
-        if (this.isReferenced()) {
+        if (path.isReferenced()) {
           const bindingInfo = scope.getBinding(node.name);
 
           // this binding isn't accessible from the parent scope so we can safely ignore it
@@ -22,7 +24,7 @@ export default function build (babel: Object): Object {
           }
           else if (scope.getAllBindings()[node.name]) {
             state.foundIncompatible = true;
-            this.stop();
+            path.stop();
           }
         }
       }
@@ -120,7 +122,7 @@ export default function build (babel: Object): Object {
         let uid = this.path.parentPath.scope.generateUidIdentifierBasedOnNode(node.id);
         this.path.parentPath.scope.rename(node.id.name, uid.name);
         path.insertBefore([node]);
-        this.path.dangerouslyRemove();
+        this.path.remove();
       }
       else {
         const uid = path.scope.generateUidIdentifier("ref");
@@ -138,39 +140,45 @@ export default function build (babel: Object): Object {
   }
 
 
-  return new Transformer("closure-elimination", {
-    Function: {
-      enter (node, parent, scope) {
-        const parentScope = scope.parent.getFunctionParent();
-        if (
-          parent.type === 'Program' ||
-          parentScope.block.type === 'Program' ||
-          (parent.type === 'CallExpression' && parent.callee === node)
-        ) {
-          return;
-        }
-        if (node.type === 'ArrowFunctionExpression') {
-          let isCompatible = true;
-          this.traverse({
-            enter (node) {
-              if (node.type === 'ThisExpression') {
-                isCompatible = false;
-                this.stop();
-              }
-              else if (this.isFunction() && node.type !== 'ArrowFunctionExpression') {
-                this.skip();
-              }
-            }
-          });
-          if (!isCompatible) {
+  return {
+    visitor: {
+      Function: {
+        enter (path) {
+          const node = path.node,
+            scope = path.scope,
+            parent = path.parentPath.node,
+            parentScope = scope.parent.getFunctionParent();
+          if (
+            parent.type === 'Program' ||
+            parentScope.block.type === 'Program' ||
+            (parent.type === 'CallExpression' && parent.callee === node)
+          ) {
             return;
           }
+          if (node.type === 'ArrowFunctionExpression') {
+            let isCompatible = true;
+            path.traverse({
+              enter (subPath) {
+                const node = subPath.node;
+                if (node.type === 'ThisExpression') {
+                  isCompatible = false;
+                  subPath.stop();
+                }
+                else if (subPath.isFunction() && node.type !== 'ArrowFunctionExpression') {
+                  subPath.skip();
+                }
+              }
+            });
+            if (!isCompatible) {
+              return;
+            }
+          }
+          const hoister = new PathHoister(path, path.parentPath.scope);
+          hoister.run();
         }
-        const hoister = new PathHoister(this, this.parentPath.scope);
-        hoister.run();
       }
     }
-  });
+  };
 
 
   /**
