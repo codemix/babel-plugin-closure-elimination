@@ -131,6 +131,7 @@ export default function build (babel: Object): Object {
           node.params,
           normalizeFunctionBody(node.body)
         );
+        replacement.loc = node.loc;
         replacement._hoisted = true;
 
         path.insertBefore([replacement]);
