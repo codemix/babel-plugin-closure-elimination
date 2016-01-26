@@ -1,9 +1,9 @@
 import Plugin from '../src';
 import fs from 'fs';
-import {parse, transform, traverse, types as t} from 'babel';
+import {parse, transform, traverse, types as t} from 'babel-core';
 
 
-function load (basename: string): string {
+function load (basename) {
   const filename = `${__dirname}/fixtures/${basename}.js`;
   return fs.readFileSync(filename, 'utf8');
 }
@@ -11,22 +11,30 @@ function load (basename: string): string {
 function collectPositions (ast: Object): Object {
   const collected = {};
   traverse(ast, {
-    enter (node: Object, parent: Object) {
-      if (this.isFunction()) {
-        collected[JSON.stringify(node.loc)] = extractPath(this.scope);
+    enter (path) {
+      const node = path.node;
+      if (path.isFunction()) {
+        if(node.loc) {
+          collected[JSON.stringify(node.loc)] = extractPath(path.scope);
+        } else {
+          throw new Error('Wrong transformed function. maybe wrong sourcemap?');
+        }
       }
     }
   });
   return collected;
 }
 
-function countHoisted (oldAst: Object, newAst: Object): number {
+function countHoisted (oldAst, newAst) {
   const oldPositions = collectPositions(oldAst);
   const newPositions = collectPositions(newAst);
   let total = 0;
   const keys = Object.keys(oldPositions);
   for (let i = 0; i < keys.length; i++) {
     let key = keys[i];
+    if(!newPositions[key]) {
+      throw new Error('some missed function');
+    }
     if (oldPositions[key] !== newPositions[key]) {
       total++;
     }
@@ -34,23 +42,23 @@ function countHoisted (oldAst: Object, newAst: Object): number {
   return total;
 }
 
-function runTest (basename: string, numberToRemove: number): void {
+function runTest (basename, numberToRemove) {
   const source = load(basename);
-  const transformedNaked = transform(source, {stage: 0});
+  const transformedNaked = transform(source, {plugins: ["transform-flow-strip-types"]});
   //console.log(transformedNaked.code);
-  const transformedWithPlugin = transform(source, {stage: 0, plugins: [Plugin]});
+  const transformedWithPlugin = transform(source, {plugins: [Plugin, "transform-flow-strip-types"]});
   //console.log(transformedWithPlugin.code);
   const diff = countHoisted(transformedNaked.ast, transformedWithPlugin.ast);
   diff.should.equal(numberToRemove);
 }
 
-function eliminate (basename: string, numberToRemove: number): void {
+function eliminate (basename, numberToRemove) {
   it(`should eliminate ${numberToRemove} closure(s) from "${basename}"`, function () {
     runTest(basename, numberToRemove);
   });
 }
 
-eliminate.only = function (basename: string, numberToRemove: number): void {
+eliminate.only = function (basename: string, numberToRemove: number) {
   it.only(`should eliminate ${numberToRemove} closure(s) from "${basename}"`, function () {
     try {
       runTest(basename, numberToRemove);
