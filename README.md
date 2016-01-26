@@ -4,6 +4,8 @@ This is a [Babel](https://babeljs.io/) plugin that eliminates unnecessary closur
 
 [![Build Status](https://travis-ci.org/codemix/babel-plugin-closure-elimination.svg)](https://travis-ci.org/codemix/babel-plugin-closure-elimination)
 
+> Note: Now requires Babel 6.
+
 # What?
 
 Turns code like this:
