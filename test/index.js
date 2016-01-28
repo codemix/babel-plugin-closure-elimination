@@ -103,7 +103,7 @@ describe('Closure Elimination', function () {
   eliminate("shadow-declaration", 2);
   eliminate("iife", 0);
   eliminate("class-compiled", 3);
-  eliminate("class-complex", 2);
+  eliminate("class-complex", 3);
   eliminate("extended-class-from-outer-parent", 2, [["foo", String.prototype.indexOf], ["bar", String.prototype.indexOf]]);
   eliminate("extended-class-from-known-class", 2, [["base", "foo"], ["base", "bar"]]);
 });
