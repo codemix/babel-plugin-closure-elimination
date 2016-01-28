@@ -16,8 +16,6 @@ function collectPositions (ast: Object): Object {
       if (path.isFunction()) {
         if(node.loc) {
           collected[JSON.stringify(node.loc)] = extractPath(path.scope);
-        } else {
-          throw new Error('Wrong transformed function. maybe wrong sourcemap?');
         }
       }
     }
@@ -42,26 +40,35 @@ function countHoisted (oldAst, newAst) {
   return total;
 }
 
-function runTest (basename, numberToRemove) {
+function runTest (basename, numberToRemove, expectedResult) {
   const source = load(basename);
-  const transformedNaked = transform(source, {plugins: ["transform-flow-strip-types"]});
+  const transformedNaked = transform(source, {"presets": ["es2015"],plugins: ["transform-flow-strip-types"]});
   //console.log(transformedNaked.code);
-  const transformedWithPlugin = transform(source, {plugins: [Plugin, "transform-flow-strip-types"]});
+  const transformedWithPlugin = transform(source, {"presets": ["es2015"],plugins: [Plugin, "transform-flow-strip-types"]});
   //console.log(transformedWithPlugin.code);
   const diff = countHoisted(transformedNaked.ast, transformedWithPlugin.ast);
   diff.should.equal(numberToRemove);
+  if (expectedResult) {
+    const context = {
+      exports: {}
+    };
+    const loaded = new Function('module', 'exports', transformedWithPlugin.code);
+    loaded(context, context.exports);
+    const result = typeof context.exports.default === 'function' ? context.exports.default() : context.exports.default;
+    result.should.eql(expectedResult);
+  }
 }
 
-function eliminate (basename, numberToRemove) {
+function eliminate (basename, numberToRemove, result) {
   it(`should eliminate ${numberToRemove} closure(s) from "${basename}"`, function () {
-    runTest(basename, numberToRemove);
+    runTest(basename, numberToRemove, result);
   });
 }
 
-eliminate.only = function (basename: string, numberToRemove: number) {
+eliminate.only = function (basename: string, numberToRemove: number, result) {
   it.only(`should eliminate ${numberToRemove} closure(s) from "${basename}"`, function () {
     try {
-      runTest(basename, numberToRemove);
+      runTest(basename, numberToRemove, result);
     }
     catch (e) {
       if (e.name !== 'AssertionError') {
@@ -96,6 +103,8 @@ describe('Closure Elimination', function () {
   eliminate("shadow-declaration", 2);
   eliminate("iife", 0);
   eliminate("class-compiled", 3);
-  eliminate("class-complex", 2);
+  eliminate("class-complex", 3);
+  eliminate("extended-class-from-outer-parent", 2, [["foo", String.prototype.indexOf], ["bar", String.prototype.indexOf]]);
+  eliminate("extended-class-from-known-class", 2, [["base", "foo"], ["base", "bar"]]);
 });
 

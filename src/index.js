@@ -1,6 +1,11 @@
 /**
  * # Closure Eliminator
  */
+
+// Do not use Symbol here. class constructor/body missed Symbol-props
+const $classConstructor = '__classConstructor';
+const $classMethod = '__classMethod';
+
 export default function build (babel: Object): Object {
   const {types: t, traverse} = babel;
 
@@ -143,12 +148,32 @@ export default function build (babel: Object): Object {
 
   return {
     visitor: {
+      Class: {
+        enter(path) {
+          const node = path.node;
+          node[$classConstructor] = node.body[$classConstructor] = true;
+          //path.traverse({// @todo maybe need skip methods?
+          //  ClassMethod: {
+          //    enter({node}) {
+          //      node[$classMethod] = node.body[$classMethod] = true;
+          //    }
+          //  }
+          //});
+        }
+      },
       Function: {
         enter (path) {
           const node = path.node,
             scope = path.scope,
             parent = path.parentPath.node,
             parentScope = scope.parent.getFunctionParent();
+          if (node[$classConstructor] || node.body[$classConstructor]) {
+            return;
+          }
+          if (path.findParent(({node}) => node._generated || node._compact)) {
+            path.skip();
+            return;
+          }
           if (
             parent.type === 'Program' ||
             parentScope.block.type === 'Program' ||
