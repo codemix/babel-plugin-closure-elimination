@@ -5,9 +5,9 @@
   "main": "lib/index.js",
   "scripts": {
     "build": "babel -d ./lib ./src",
-    "prepublish": "npm run build",
+    "prepublish": "npm run test",
     "pretest": "npm run build",
-    "test": "mocha --harmony",
+    "test": "mocha test/index.js",
     "watch": "mocha --watch"
   },
   "repository": {
