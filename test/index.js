@@ -127,6 +127,6 @@ describe('Closure Elimination', function () {
   eliminate("extended-class-from-outer-parent", 2, [["foo", String.prototype.indexOf], ["bar", String.prototype.indexOf]]);
   eliminate("extended-class-from-known-class", 2, [["base", "foo"], ["base", "bar"]]);
   eliminate("generator", 1, ["foo", 1, 2, 3]);
-  eliminate("async", 1, Promise.resolve(1));
+  eliminate("async", 1, true);
 });
 

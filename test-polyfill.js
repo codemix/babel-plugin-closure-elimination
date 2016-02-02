@@ -3,3 +3,4 @@ require("babel-register")({
   "plugins": ["transform-flow-strip-types"]
 });
 require("babel-regenerator-runtime");
+require("babel-polyfill");

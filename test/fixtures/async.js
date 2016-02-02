@@ -5,5 +5,5 @@ function asyncF() {
 }
 
 export default function demo() {
-  return asyncF()();
+  return asyncF()() instanceof Promise;
 }
