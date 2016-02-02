@@ -137,6 +137,8 @@ export default function build (babel: Object): Object {
           normalizeFunctionBody(node.body)
         );
         replacement.loc = node.loc;
+        replacement.generator = node.generator;
+        replacement.async = node.async;
         replacement._hoisted = true;
 
         path.insertBefore([replacement]);

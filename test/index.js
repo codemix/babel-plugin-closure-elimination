@@ -42,9 +42,29 @@ function countHoisted (oldAst, newAst) {
 
 function runTest (basename, numberToRemove, expectedResult) {
   const source = load(basename);
-  const transformedNaked = transform(source, {"presets": ["es2015"],plugins: ["transform-flow-strip-types"]});
+  const transformedNaked = transform(
+    source,
+    {
+      presets: ["es2015"],
+      plugins: [
+        "transform-flow-strip-types",
+        "syntax-async-functions",
+        "transform-regenerator"
+      ]
+    }
+  );
   //console.log(transformedNaked.code);
-  const transformedWithPlugin = transform(source, {"presets": ["es2015"],plugins: [Plugin, "transform-flow-strip-types"]});
+  const transformedWithPlugin = transform(
+    source,
+    {
+      presets: ["es2015"],
+      plugins: [
+        Plugin,
+        "transform-flow-strip-types",
+        "syntax-async-functions",
+        "transform-regenerator"
+      ]
+    });
   //console.log(transformedWithPlugin.code);
   const diff = countHoisted(transformedNaked.ast, transformedWithPlugin.ast);
   diff.should.equal(numberToRemove);
@@ -106,5 +126,7 @@ describe('Closure Elimination', function () {
   eliminate("class-complex", 3);
   eliminate("extended-class-from-outer-parent", 2, [["foo", String.prototype.indexOf], ["bar", String.prototype.indexOf]]);
   eliminate("extended-class-from-known-class", 2, [["base", "foo"], ["base", "bar"]]);
+  eliminate("generator", 1, ["foo", 1, 2, 3]);
+  eliminate("async", 1, Promise.resolve(1));
 });
 
