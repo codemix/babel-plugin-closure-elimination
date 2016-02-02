@@ -1,5 +1,6 @@
-require("babel-core/register")({
+require("babel-register")({
   "presets": ["es2015"],
   "plugins": ["transform-flow-strip-types"]
 });
 require("babel-regenerator-runtime");
+require("babel-polyfill");
