@@ -154,13 +154,13 @@ export default function build (babel: Object): Object {
         enter(path) {
           const node = path.node;
           node[$classConstructor] = node.body[$classConstructor] = true;
-          //path.traverse({// @todo maybe need skip methods?
-          //  ClassMethod: {
-          //    enter({node}) {
-          //      node[$classMethod] = node.body[$classMethod] = true;
-          //    }
-          //  }
-          //});
+          path.traverse({
+            ClassMethod: {
+              enter({node}) {
+                node[$classMethod] = node.body[$classMethod] = true;
+              }
+            }
+          });
         }
       },
       Function: {
@@ -169,7 +169,7 @@ export default function build (babel: Object): Object {
             scope = path.scope,
             parent = path.parentPath.node,
             parentScope = scope.parent.getFunctionParent();
-          if (node[$classConstructor] || node.body[$classConstructor]) {
+          if (node[$classConstructor] || node.body[$classConstructor] || node[$classMethod]) {
             return;
           }
           if (path.findParent(({node}) => node._generated || node._compact)) {
