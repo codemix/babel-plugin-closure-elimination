@@ -5,6 +5,7 @@
 // Do not use Symbol here. class constructor/body missed Symbol-props
 const $classConstructor = '__classConstructor';
 const $classMethod = '__classMethod';
+const $objectMethod = '__objectMethod';
 
 export default function build (babel: Object): Object {
   const {types: t, traverse} = babel;
@@ -150,6 +151,17 @@ export default function build (babel: Object): Object {
 
   return {
     visitor: {
+      ObjectExpression: {
+        enter(path) {
+          path.traverse({
+            ObjectMethod: {
+              enter({node}) {
+                node[$objectMethod] = node.body[$objectMethod] = true;
+              }
+            }
+          });
+        }
+      },
       Class: {
         enter(path) {
           const node = path.node;
@@ -169,7 +181,7 @@ export default function build (babel: Object): Object {
             scope = path.scope,
             parent = path.parentPath.node,
             parentScope = scope.parent.getFunctionParent();
-          if (node[$classConstructor] || node.body[$classConstructor] || node[$classMethod]) {
+          if (node[$classConstructor] || node.body[$classConstructor] || node[$classMethod] || node[$objectMethod]) {
             return;
           }
           if (path.findParent(({node}) => node._generated || node._compact)) {
