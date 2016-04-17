@@ -15,7 +15,7 @@ export default function build (babel: Object): Object {
         scope = path.scope;
       if (!path.isJSXIdentifier() && path.isIdentifier()) {
         // direct references that we need to track to hoist this to the highest scope we can
-        if (path.isReferenced()) {
+        if (path.isReferenced() || path.parent.type == 'AssignmentExpression') {
           const bindingInfo = scope.getBinding(node.name);
 
           // this binding isn't accessible from the parent scope so we can safely ignore it

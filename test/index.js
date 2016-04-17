@@ -130,5 +130,6 @@ describe('Closure Elimination', function () {
   eliminate("async", 1, true);
   //@todo better testing with babel-preset-es2015-node5 - look https://github.com/codemix/babel-plugin-closure-elimination/pull/11
   eliminate("create-class", 1);
+  eliminate("assign-expression", 3, [ 3, 2, "yo", 2, 1 ]);
 });
 
