@@ -128,6 +128,7 @@ describe('Closure Elimination', function () {
   eliminate("extended-class-from-known-class", 2, [["base", "foo"], ["base", "bar"]]);
   eliminate("generator", 1, ["foo", 1, 2, 3]);
   eliminate("async", 1, true);
+  //@todo better testing with babel-preset-es2015-node5 - look https://github.com/codemix/babel-plugin-closure-elimination/pull/11
   eliminate("create-class", 1);
 });
 
