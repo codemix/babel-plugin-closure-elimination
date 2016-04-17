@@ -131,5 +131,7 @@ describe('Closure Elimination', function () {
   //@todo better testing with babel-preset-es2015-node5 - look https://github.com/codemix/babel-plugin-closure-elimination/pull/11
   eliminate("create-class", 1);
   eliminate("assign-expression", 3, [ 3, 2, "yo", 2, 1 ]);
+  eliminate("assign-expression-and-referenced", 0, [ 1, [ 1, 1 ], [ 123 ] ]);
+  eliminate("possible-scope-hoisting", 0/*TODO bar may be hoisted at 1 level*/, [1]);
 });
 
