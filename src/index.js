@@ -196,6 +196,10 @@ export default function build (babel: Object): Object {
             return;
           }
           if (node.type === 'ArrowFunctionExpression') {
+            // If we don't use `transform-es2015-arrow-functions`,
+            // the non-block arrow function will not have own scope.
+            path.ensureBlock();
+
             let isCompatible = true;
             path.traverse({
               enter (subPath) {
