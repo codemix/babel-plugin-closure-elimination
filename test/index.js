@@ -135,5 +135,6 @@ describe('Closure Elimination', function () {
   eliminate("possible-scope-hoisting", 1, [1]);
   eliminate("object-shorthand-func", 1, [1, 2, 3]);
   eliminate("no-function-scope", 1, 'bar');
+  eliminate("assign-expression-array-pattern", 0, 2);
 });
 
