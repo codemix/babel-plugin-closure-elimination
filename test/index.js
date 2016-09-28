@@ -135,5 +135,6 @@ describe('Closure Elimination', function () {
   //@todo maybe worked better, if used tip from https://github.com/codemix/babel-plugin-closure-elimination/issues/7#issuecomment-178859542
   eliminate("possible-scope-hoisting", 0/*TODO bar may be hoisted at 1 level*/, [1]);
   eliminate("object-shorthand-func", 1, [1, 2, 3]);
+  eliminate("assign-expression-array-pattern", 0, 2);
 });
 
