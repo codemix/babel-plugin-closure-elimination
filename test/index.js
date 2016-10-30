@@ -122,7 +122,7 @@ describe('Closure Elimination', function () {
   eliminate("declaration", 2);
   eliminate("shadow-declaration", 2);
   eliminate("iife", 0);
-  eliminate("class-compiled", 3);
+  eliminate("class-compiled", 4);
   eliminate("class-complex", 3);
   eliminate("extended-class-from-outer-parent", 2, [["foo", String.prototype.indexOf], ["bar", String.prototype.indexOf]]);
   eliminate("extended-class-from-known-class", 2, [["base", "foo"], ["base", "bar"]]);
@@ -132,8 +132,8 @@ describe('Closure Elimination', function () {
   eliminate("create-class", 1);
   eliminate("assign-expression", 3, [ 3, 2, "yo", 2, 1 ]);
   eliminate("assign-expression-and-referenced", 0, [ 1, [ 1, 1 ], [ 123 ] ]);
-  //@todo maybe worked better, if used tip from https://github.com/codemix/babel-plugin-closure-elimination/issues/7#issuecomment-178859542
-  eliminate("possible-scope-hoisting", 0/*TODO bar may be hoisted at 1 level*/, [1]);
+  eliminate("possible-scope-hoisting", 1, [1]);
   eliminate("object-shorthand-func", 1, [1, 2, 3]);
+  eliminate("no-function-scope", 1, 'bar');
 });
 
