@@ -13,6 +13,23 @@ export default function build(babel:Object):Object {
 
   return {
     visitor: {
+      Function: {
+        exit (path) {
+          const {node} = path;
+          if (node[$classConstructor] || node.body[$classConstructor] || node[$classMethod] || node[$objectMethod] || node[$bindedArrowFunction]) {
+            return;
+          }
+          if (path.findParent(({node}) => node._generated || node._compact)) {
+            path.skip();
+            return;
+          }
+          const bestParentScope = getBestHoistedScope(path);
+          if (bestParentScope !== path.scope.parent) {
+            const attachPath = getAttachmentPosition(bestParentScope.path, path);
+            moveToNewPosition(path, attachPath);
+          }
+        }
+      },
       ObjectExpression: {
         enter(path) {
           path.traverse({
@@ -39,86 +56,32 @@ export default function build(babel:Object):Object {
       },
       ThisExpression: {
         enter(path) {
-          debugger;
           var parentArrow = path;
           while (parentArrow = parentArrow.findParent(node=>node.type === 'ArrowFunctionExpression')) {
             parentArrow.node[$bindedArrowFunction] = true;
           }
         }
-      },
-      Function: {
-        exit (path) {
-          const node = path.node,
-            scope = path.scope;
-          if (node[$classConstructor] || node.body[$classConstructor] || node[$classMethod] || node[$objectMethod] || node[$bindedArrowFunction]) {
-            return;
-          }
-          if (path.findParent(({node}) => node._generated || node._compact)) {
-            path.skip();
-            return;
-          }
-          var parentScopes = getAllParentScopes(path.scope),
-            parentBindings = path.scope.parent.getAllBindings();
-
-          for (let i in parentBindings) {
-            let hasUsageOfBinding = []
-              .concat(parentBindings[i].referencePaths)
-              .concat(parentBindings[i].constantViolations)
-              .some(subPath => subPath.getAncestry().indexOf(path) !== -1);
-            if (hasUsageOfBinding) {
-              let idx = parentScopes.indexOf(parentBindings[i].scope);
-              if (idx !== -1) {
-                parentScopes.splice(idx + 1, Infinity);
-              }
-            }
-          }
-          const bestParentScope = parentScopes.pop();
-
-          if (bestParentScope !== path.scope.parent) {
-            const bestParent = bestParentScope.path;
-            let attachPathes;
-            if (bestParent.isFunction()) {
-              attachPathes = bestParent.get('body.body');
-            } else if (bestParent.isProgram()) {
-              attachPathes = bestParent.get('body');
-            } else if (bestParent.isBlockStatement()) {
-              attachPathes = bestParent.get('body');
-            }
-            let parents = path.getAncestry(),
-              attachPath = attachPathes.find(x => parents.indexOf(x) !== -1);
-
-            if (node.type === 'FunctionDeclaration') {
-              let uid = bestParentScope.generateUidIdentifierBasedOnNode(node.id);
-              scope.rename(node.id.name, uid.name);
-              scope.moveBindingTo(uid.name, bestParentScope);
-
-              node._hoisted = true;
-              attachPath.insertBefore([node]);
-              path.remove();
-            }
-            else {
-              const uid = node.id ?
-                path.parentPath.scope.generateUidIdentifierBasedOnNode(node.id) :
-                path.scope.generateUidIdentifier("ref");
-              const replacement = t.functionDeclaration(
-                uid,
-                node.params,
-                normalizeFunctionBody(node.body)
-              );
-              replacement.loc = node.loc;
-              replacement.generator = node.generator;
-              replacement.async = node.async;
-              replacement._hoisted = true;
-
-              attachPath.insertBefore([replacement]);
-              path.replaceWith(t.identifier(uid.name));
-              bestParentScope.crawl();
-            }
-          }
-        }
       }
     }
   };
+
+  function getBestHoistedScope(path) {
+    const parentScopes = getAllParentScopes(path.scope),
+      parentBindings = path.scope.parent.getAllBindings();
+    for (let id in parentBindings) {
+      let hasUsageOfBinding = []
+        .concat(parentBindings[id].referencePaths)
+        .concat(parentBindings[id].constantViolations)
+        .some(subPath => subPath.getAncestry().indexOf(path) !== -1);
+      if (hasUsageOfBinding) {
+        let idx = parentScopes.indexOf(parentBindings[id].scope);
+        if (idx !== -1) {
+          parentScopes.splice(idx + 1, Infinity);
+        }
+      }
+    }
+    return parentScopes.pop();
+  }
 
   function getAllParentScopes(scope) {
     var scopes = [];
@@ -128,6 +91,43 @@ export default function build(babel:Object):Object {
     return scopes;
   }
 
+  function getAttachmentPosition(bestParent, prevPath) {
+    let possibleSiblings;
+    if (bestParent.isFunction()) {
+      possibleSiblings = bestParent.get('body.body');
+    } else if (bestParent.isProgram() || bestParent.isBlockStatement()) {
+      possibleSiblings = bestParent.get('body');
+    }
+    const prevParents = prevPath.getAncestry();
+    return possibleSiblings.find(x => prevParents.indexOf(x) !== -1);
+  }
+
+  function moveToNewPosition(path, attachPath) {
+    const {node, scope} = path,
+      newScope = attachPath.parentPath.scope;
+    if (node.type === 'FunctionDeclaration') {
+      let uid = newScope.generateUidIdentifierBasedOnNode(node.id);
+      scope.rename(node.id.name, uid.name);
+      scope.moveBindingTo(uid.name, newScope);
+      node._hoisted = true;
+      attachPath.insertBefore([node]);
+      path.remove();
+    } else {
+      const uid = path.parentPath.scope.generateUidIdentifierBasedOnNode(node.id),
+        replacement = t.functionDeclaration(
+          uid,
+          node.params,
+          normalizeFunctionBody(node.body)
+        );
+      replacement.loc = node.loc;
+      replacement.generator = node.generator;
+      replacement.async = node.async;
+      replacement._hoisted = true;
+      attachPath.insertBefore([replacement]);
+      path.replaceWith(t.identifier(uid.name));
+      newScope.crawl();
+    }
+  }
 
   /**
    * Normalize a function body so that it is always a BlockStatement.
