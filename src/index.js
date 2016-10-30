@@ -30,36 +30,28 @@ export default function build(babel:Object):Object {
           }
         }
       },
-      ObjectExpression: {
-        enter(path) {
-          path.traverse({
-            ObjectMethod: {
-              enter({node}) {
-                node[$objectMethod] = node.body[$objectMethod] = true;
-              }
-            }
-          });
+      ObjectMethod: {
+        enter({node}) {
+          node[$objectMethod] = node.body[$objectMethod] = true;
         }
       },
       Class: {
-        enter(path) {
-          const node = path.node;
+        enter({node}) {
           node[$classConstructor] = node.body[$classConstructor] = true;
-          path.traverse({
-            ClassMethod: {
-              enter({node}) {
-                node[$classMethod] = node.body[$classMethod] = true;
-              }
-            }
-          });
+        }
+      },
+      ClassMethod: {
+        enter({node}) {
+          node[$classMethod] = node.body[$classMethod] = true;
         }
       },
       ThisExpression: {
         enter(path) {
-          var parentArrow = path;
-          while (parentArrow = parentArrow.findParent(node=>node.type === 'ArrowFunctionExpression')) {
-            parentArrow.node[$bindedArrowFunction] = true;
-          }
+          path.getAncestry()
+            .filter(path=>path.type === 'ArrowFunctionExpression')
+            .forEach(parentArrow => {
+              parentArrow.node[$bindedArrowFunction] = true
+            });
         }
       }
     }
