@@ -5,7 +5,6 @@ import 'babel-polyfill';
  */
 
 // Do not use Symbol here. class constructor/body missed Symbol-props
-const $objectMethod = '__objectMethod';
 const $boundArrowFunction = '__boundArrowFunction';
 const $usedEval = '__usedEval';
 
@@ -17,10 +16,7 @@ export default function build(babel:Object):Object {
       Function: {
         exit (path) {
           const {node} = path;
-          if (
-            path.isClassMethod() ||
-            node[$objectMethod] || node[$boundArrowFunction] || node[$usedEval]
-          ) {
+          if (path.isClassMethod() || path.isObjectMethod() || node[$boundArrowFunction] || node[$usedEval]) {
             return;
           }
           if (path.findParent(({node}) => node._generated || node._compact)) {
@@ -32,11 +28,6 @@ export default function build(babel:Object):Object {
             const attachPath = getAttachmentPosition(bestParentScope.path, path);
             moveToNewPosition(path, attachPath);
           }
-        }
-      },
-      ObjectMethod: {
-        enter({node}) {
-          node[$objectMethod] = node.body[$objectMethod] = true;
         }
       },
       ThisExpression: {
