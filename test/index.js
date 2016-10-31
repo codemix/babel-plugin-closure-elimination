@@ -137,5 +137,6 @@ describe('Closure Elimination', function () {
   eliminate("no-function-scope", 1, 'bar');
   eliminate("assign-expression-array-pattern", 0, 2);
   eliminate("eval-deopt", 0, 'bar');
+  eliminate("eval-no-deopt", 1, 'bar');
 });
 

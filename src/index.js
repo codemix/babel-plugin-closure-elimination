@@ -62,7 +62,7 @@ export default function build(babel:Object):Object {
       },
       Identifier: {
         enter(path) {
-          if(path.node.name === 'eval') {
+          if(path.node.name === 'eval' && path.parentPath.type === 'CallExpression') {
             path.getAncestry()
               .filter(path=>path.isFunction())
               .forEach(parentArrow => {
