@@ -25,6 +25,8 @@ function collectPositions (ast: Object): Object {
       if (path.isFunction()) {
         if(node.loc) {
           collected[JSON.stringify(node.loc)] = extractPath(path.scope);
+        } else if(node.body.loc) {
+          collected[JSON.stringify(node.body.loc)] = extractPath(path.scope);
         }
       }
     }
@@ -138,27 +140,28 @@ describe('Closure Elimination', function () {
   eliminate("nope", 0);
   eliminate("arrow-this", 1);
   eliminate("arrow-this-nested", 2);
-  eliminate("class", 1, 'bar');
+  eliminate("class", 2, 'bar');
   eliminate("class", 1, 'bar', {});
   eliminate("declaration", 2);
   eliminate("shadow-declaration", 2);
   eliminate("iife", 0);
   eliminate("class-compiled", 4);
-  eliminate("class-complex", 2, [2, 3, 4]);
+  eliminate("class-complex", 3, [2, 3, 4]);
   eliminate("class-complex", 2, [2, 3, 4], {});
-  eliminate("extended-class-from-outer-parent", 2, [["foo", RegExp.prototype.test], ["bar", RegExp.prototype.test]]);
+  eliminate("extended-class-from-outer-parent", 4, [["foo", RegExp.prototype.test], ["bar", RegExp.prototype.test]]);
   eliminate("extended-class-from-outer-parent", 2, [["foo", RegExp.prototype.test], ["bar", RegExp.prototype.test]], {});
-  eliminate("extended-class-from-known-class", 2, [["base", "foo"], ["base", "bar"]]);
+  eliminate("extended-class-from-known-class", 4, [["base", "foo"], ["base", "bar"]]);
   eliminate("extended-class-from-known-class", 2, [["base", "foo"], ["base", "bar"]], {});
   eliminate("generator", 1, ["foo", 1, 2, 3]);
   eliminate("async", 1, true);
-  eliminate("create-class", 1, ['foo', 'bar']);
+  eliminate("create-class", 2, ['foo', 'bar']);
   eliminate("create-class", 1, ['foo', 'bar'], {presets: ['babel-preset-es2015-node5']});
   eliminate("create-class", 1, ['foo', 'bar'], {});
   eliminate("assign-expression", 3, [ 3, 2, "yo", 2, 1 ]);
   eliminate("assign-expression-and-referenced", 0, [ 1, [ 1, 1 ], [ 123 ] ]);
   eliminate("possible-scope-hoisting", 1, [1]);
-  eliminate("object-shorthand-func", 1, [1, 2, 3]);
+  eliminate("object-shorthand-func", 3, [1, 2, 3]);
+  eliminate("object-shorthand-func", 1, [1, 2, 3], {plugins:["transform-es2015-destructuring"]});
   eliminate("no-function-scope", 1, 'bar');
   eliminate("assign-expression-array-pattern", 0, 2);
   eliminate("eval-deopt", 0, 'bar');
