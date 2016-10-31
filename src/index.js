@@ -4,9 +4,8 @@ import 'babel-polyfill';
  * # Closure Eliminator
  */
 
-// Do not use Symbol here. class constructor/body missed Symbol-props
-const $boundArrowFunction = '__boundArrowFunction';
-const $usedEval = '__usedEval';
+const $boundArrowFunction = Symbol('boundArrowFunction');
+const $usedEval = Symbol('usedEval');
 
 export default function build(babel:Object):Object {
   const {types: t} = babel;
