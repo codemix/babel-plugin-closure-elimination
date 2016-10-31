@@ -1,7 +1,16 @@
 import Plugin from '../src';
 import fs from 'fs';
+import _ from 'lodash';
 import {parse, transform, traverse, types as t} from 'babel-core';
 
+const defaultBabelSettings = {
+  presets: ["es2015"],
+  plugins: [
+    "transform-flow-strip-types",
+    "syntax-async-functions",
+    "transform-regenerator"
+  ]
+};
 
 function load (basename) {
   const filename = `${__dirname}/fixtures/${basename}.js`;
@@ -40,31 +49,40 @@ function countHoisted (oldAst, newAst) {
   return total;
 }
 
-function runTest (basename, numberToRemove, expectedResult) {
+function needConcatArray(objValue, srcValue) {
+  if (_.isArray(objValue)) {
+    return objValue.concat(srcValue);
+  }
+}
+
+function runTest (basename, numberToRemove, expectedResult, settings = defaultBabelSettings) {
   const source = load(basename);
   const transformedNaked = transform(
     source,
-    {
-      presets: ["es2015"],
-      plugins: [
-        "transform-flow-strip-types",
-        "syntax-async-functions",
-        "transform-regenerator"
-      ]
-    }
+    _.mergeWith(
+      {
+        plugins: [
+          "transform-es2015-modules-commonjs"
+        ]
+      },
+      settings,
+      needConcatArray
+    )
   );
   //console.log(transformedNaked.code);
   const transformedWithPlugin = transform(
     source,
-    {
-      presets: ["es2015"],
-      plugins: [
-        Plugin,
-        "transform-flow-strip-types",
-        "syntax-async-functions",
-        "transform-regenerator"
-      ]
-    });
+    _.mergeWith(
+      {
+        plugins: [
+          Plugin,
+          "transform-es2015-modules-commonjs"
+        ]
+      },
+      settings,
+      needConcatArray
+    )
+  );
   //console.log(transformedWithPlugin.code);
   const diff = countHoisted(transformedNaked.ast, transformedWithPlugin.ast);
   diff.should.equal(numberToRemove);
@@ -79,16 +97,16 @@ function runTest (basename, numberToRemove, expectedResult) {
   }
 }
 
-function eliminate (basename, numberToRemove, result) {
+function eliminate (basename, numberToRemove, result, settings) {
   it(`should eliminate ${numberToRemove} closure(s) from "${basename}"`, function () {
-    runTest(basename, numberToRemove, result);
+    runTest(basename, numberToRemove, result, settings);
   });
 }
 
-eliminate.only = function (basename: string, numberToRemove: number, result) {
+eliminate.only = function (basename: string, numberToRemove: number, result, settings) {
   it.only(`should eliminate ${numberToRemove} closure(s) from "${basename}"`, function () {
     try {
-      runTest(basename, numberToRemove, result);
+      runTest(basename, numberToRemove, result, settings);
     }
     catch (e) {
       if (e.name !== 'AssertionError') {
