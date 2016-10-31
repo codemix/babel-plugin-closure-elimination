@@ -98,13 +98,15 @@ function runTest (basename, numberToRemove, expectedResult, settings = defaultBa
 }
 
 function eliminate (basename, numberToRemove, result, settings) {
-  it(`should eliminate ${numberToRemove} closure(s) from "${basename}"`, function () {
+  let settingsName = settings ? ` with settings ${JSON.stringify(settings)}` : '';
+  it(`should eliminate ${numberToRemove} closure(s) from "${basename}"${settingsName}`, function () {
     runTest(basename, numberToRemove, result, settings);
   });
 }
 
 eliminate.only = function (basename: string, numberToRemove: number, result, settings) {
-  it.only(`should eliminate ${numberToRemove} closure(s) from "${basename}"`, function () {
+  let settingsName = settings ? ` with settings ${JSON.stringify(settings)}` : '';
+  it.only(`should eliminate ${numberToRemove} closure(s) from "${basename}"${settingsName}`, function () {
     try {
       runTest(basename, numberToRemove, result, settings);
     }
@@ -136,18 +138,23 @@ describe('Closure Elimination', function () {
   eliminate("nope", 0);
   eliminate("arrow-this", 1);
   eliminate("arrow-this-nested", 2);
-  eliminate("class", 1);
+  eliminate("class", 1, 'bar');
+  eliminate("class", 1, 'bar', {});
   eliminate("declaration", 2);
   eliminate("shadow-declaration", 2);
   eliminate("iife", 0);
   eliminate("class-compiled", 4);
-  eliminate("class-complex", 3);
-  eliminate("extended-class-from-outer-parent", 2, [["foo", String.prototype.indexOf], ["bar", String.prototype.indexOf]]);
+  eliminate("class-complex", 2, [2, 3, 4]);
+  eliminate("class-complex", 2, [2, 3, 4], {});
+  eliminate("extended-class-from-outer-parent", 2, [["foo", RegExp.prototype.test], ["bar", RegExp.prototype.test]]);
+  eliminate("extended-class-from-outer-parent", 2, [["foo", RegExp.prototype.test], ["bar", RegExp.prototype.test]], {});
   eliminate("extended-class-from-known-class", 2, [["base", "foo"], ["base", "bar"]]);
+  eliminate("extended-class-from-known-class", 2, [["base", "foo"], ["base", "bar"]], {});
   eliminate("generator", 1, ["foo", 1, 2, 3]);
   eliminate("async", 1, true);
-  //@todo better testing with babel-preset-es2015-node5 - look https://github.com/codemix/babel-plugin-closure-elimination/pull/11
-  eliminate("create-class", 1);
+  eliminate("create-class", 1, ['foo', 'bar']);
+  eliminate("create-class", 1, ['foo', 'bar'], {presets: ['babel-preset-es2015-node5']});
+  eliminate("create-class", 1, ['foo', 'bar'], {});
   eliminate("assign-expression", 3, [ 3, 2, "yo", 2, 1 ]);
   eliminate("assign-expression-and-referenced", 0, [ 1, [ 1, 1 ], [ 123 ] ]);
   eliminate("possible-scope-hoisting", 1, [1]);

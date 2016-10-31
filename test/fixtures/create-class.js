@@ -1,14 +1,13 @@
-function createClass() {
+export default function createClass() {
   var C = class {
-    constructor(a, b) {
+    constructor(a) {
       this.a = a;
-      this.b = b;
     }
 
     f() {
-      return () => 'yo';
+      return [(() => 'foo')(), this.a];
     }
   };
 
-  return C;
+  return new C('bar').f();
 }

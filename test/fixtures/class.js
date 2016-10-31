@@ -1,9 +1,12 @@
-export default class Demo {
-  constructor (url) {
-    this.url = url;
-  }
+export default function demo() {
+  class Demo {
+    constructor (url) {
+      this.url = url;
+    }
 
-  foo () {
-    return () => "bar";
+    foo () {
+      return (() => "bar")();
+    }
   }
+  return new Demo().foo();
 }
