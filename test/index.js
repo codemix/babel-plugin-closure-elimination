@@ -136,5 +136,6 @@ describe('Closure Elimination', function () {
   eliminate("object-shorthand-func", 1, [1, 2, 3]);
   eliminate("no-function-scope", 1, 'bar');
   eliminate("assign-expression-array-pattern", 0, 2);
+  eliminate("eval-deopt", 0, 'bar');
 });
 

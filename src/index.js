@@ -9,6 +9,7 @@ const $classConstructor = '__classConstructor';
 const $classMethod = '__classMethod';
 const $objectMethod = '__objectMethod';
 const $boundArrowFunction = '__boundArrowFunction';
+const $usedEval = '__usedEval';
 
 export default function build(babel:Object):Object {
   const {types: t} = babel;
@@ -18,7 +19,10 @@ export default function build(babel:Object):Object {
       Function: {
         exit (path) {
           const {node} = path;
-          if (node[$classConstructor] || node.body[$classConstructor] || node[$classMethod] || node[$objectMethod] || node[$boundArrowFunction]) {
+          if (
+            node[$classConstructor] || node.body[$classConstructor] || node[$classMethod] ||
+            node[$objectMethod] || node[$boundArrowFunction] || node[$usedEval]
+          ) {
             return;
           }
           if (path.findParent(({node}) => node._generated || node._compact)) {
@@ -52,8 +56,19 @@ export default function build(babel:Object):Object {
           path.getAncestry()
             .filter(path=>path.type === 'ArrowFunctionExpression')
             .forEach(parentArrow => {
-              parentArrow.node[$boundArrowFunction] = true
+              parentArrow.node[$boundArrowFunction] = true;
             });
+        }
+      },
+      Identifier: {
+        enter(path) {
+          if(path.node.name === 'eval') {
+            path.getAncestry()
+              .filter(path=>path.isFunction())
+              .forEach(parentArrow => {
+                parentArrow.node[$usedEval] = true;
+              });
+          }
         }
       }
     }
