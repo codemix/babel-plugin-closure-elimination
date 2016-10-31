@@ -148,8 +148,8 @@ describe('Closure Elimination', function () {
   eliminate("class-compiled", 4);
   eliminate("class-complex", 3, [2, 3, 4]);
   eliminate("class-complex", 2, [2, 3, 4], {});
-  eliminate("extended-class-from-outer-parent", 4, [["foo", RegExp.prototype.test], ["bar", RegExp.prototype.test]]);
-  eliminate("extended-class-from-outer-parent", 2, [["foo", RegExp.prototype.test], ["bar", RegExp.prototype.test]], {});
+  eliminate("extended-class-from-outer-parent", 4, [["foo", Date.prototype.getDate], ["bar", Date.prototype.getDate]]);
+  eliminate("extended-class-from-outer-parent", 2, [["foo", Date.prototype.getDate], ["bar", Date.prototype.getDate]], {});
   eliminate("extended-class-from-known-class", 4, [["base", "foo"], ["base", "bar"]]);
   eliminate("extended-class-from-known-class", 2, [["base", "foo"], ["base", "bar"]], {});
   eliminate("generator", 1, ["foo", 1, 2, 3]);

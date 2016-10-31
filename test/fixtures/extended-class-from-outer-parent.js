@@ -1,16 +1,16 @@
-class Demo1 extends RegExp {
+class Demo1 extends Date {
   foo () {
     var tmp = ()=>"foo";
-    return [tmp(), this.test];
+    return [tmp(), this.getDate];
   }
 }
-class Demo2 extends RegExp {
+class Demo2 extends Date {
   constructor() {
     super();
     this.bar = ()=>"bar";
   }
   foo () {
-    return [this.bar(), this.test];
+    return [this.bar(), this.getDate];
   }
 }
 export default function demo() {
