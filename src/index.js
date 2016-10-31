@@ -6,7 +6,7 @@
 const $classConstructor = '__classConstructor';
 const $classMethod = '__classMethod';
 const $objectMethod = '__objectMethod';
-const $bindedArrowFunction = '__bindedArrowFunction';
+const $boundArrowFunction = '__boundArrowFunction';
 
 export default function build(babel:Object):Object {
   const {types: t} = babel;
@@ -16,14 +16,14 @@ export default function build(babel:Object):Object {
       Function: {
         exit (path) {
           const {node} = path;
-          if (node[$classConstructor] || node.body[$classConstructor] || node[$classMethod] || node[$objectMethod] || node[$bindedArrowFunction]) {
+          if (node[$classConstructor] || node.body[$classConstructor] || node[$classMethod] || node[$objectMethod] || node[$boundArrowFunction]) {
             return;
           }
           if (path.findParent(({node}) => node._generated || node._compact)) {
             path.skip();
             return;
           }
-          const bestParentScope = getBestHoistedScope(path);
+          const bestParentScope = getHighestCompatibleHoistedScope(path);
           if (bestParentScope !== path.scope.parent) {
             const attachPath = getAttachmentPosition(bestParentScope.path, path);
             moveToNewPosition(path, attachPath);
@@ -50,14 +50,14 @@ export default function build(babel:Object):Object {
           path.getAncestry()
             .filter(path=>path.type === 'ArrowFunctionExpression')
             .forEach(parentArrow => {
-              parentArrow.node[$bindedArrowFunction] = true
+              parentArrow.node[$boundArrowFunction] = true
             });
         }
       }
     }
   };
 
-  function getBestHoistedScope(path) {
+  function getHighestCompatibleHoistedScope(path) {
     const parentScopes = getAllParentScopes(path.scope),
       parentBindings = path.scope.parent.getAllBindings();
     for (let id in parentBindings) {

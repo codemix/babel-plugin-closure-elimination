@@ -4,7 +4,7 @@
   "description": "Removes closures from your JavaScript in the name of performance.",
   "main": "lib/index.js",
   "scripts": {
-    "build": "babel -d ./lib ./src",
+    "build": "babel --plugins ../lib -d ./lib ./src",
     "prepublish": "npm run test",
     "pretest": "npm run build",
     "test": "mocha test/index.js",
