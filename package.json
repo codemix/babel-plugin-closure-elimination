@@ -1,6 +1,6 @@
 {
   "name": "babel-plugin-closure-elimination",
-  "version": "1.0.6",
+  "version": "1.1.0",
   "description": "Removes closures from your JavaScript in the name of performance.",
   "main": "lib/index.js",
   "scripts": {
