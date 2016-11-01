@@ -7,7 +7,7 @@ import 'babel-polyfill';
 const $boundArrowFunction = Symbol('boundArrowFunction');
 const $usedEval = Symbol('usedEval');
 
-export default function build(babel:Object):Object {
+export default function build(babel: Object): Object {
   const {types: t} = babel;
 
   return {
@@ -23,7 +23,7 @@ export default function build(babel:Object):Object {
             return;
           }
           const bestParentScope = getHighestCompatibleHoistedScope(path);
-          if (bestParentScope !== path.scope.parent) {
+          if (bestParentScope) {
             const attachPath = getAttachmentPosition(bestParentScope.path, path);
             moveToNewPosition(path, attachPath);
           }
@@ -40,7 +40,7 @@ export default function build(babel:Object):Object {
       },
       Identifier: {
         enter(path) {
-          if(path.node.name === 'eval' && path.parentPath.type === 'CallExpression') {
+          if (path.node.name === 'eval' && path.parentPath.type === 'CallExpression') {
             path.getAncestry()
               .filter(path=>path.isFunction())
               .forEach(parentArrow => {
@@ -67,7 +67,10 @@ export default function build(babel:Object):Object {
         }
       }
     }
-    return parentScopes.pop();
+    return parentScopes
+      .filter(({path}) => !path.isProgram() || path.node.sourceType === 'module')
+      .filter(scope => scope !== path.scope.parent)
+      .pop();
   }
 
   function getAllParentScopes(scope) {
@@ -119,7 +122,7 @@ export default function build(babel:Object):Object {
   /**
    * Normalize a function body so that it is always a BlockStatement.
    */
-  function normalizeFunctionBody(node:Object):Object {
+  function normalizeFunctionBody(node: Object): Object {
     if (node.type !== 'BlockStatement') {
       return t.blockStatement([
         t.returnStatement(node)

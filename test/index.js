@@ -12,20 +12,20 @@ const defaultBabelSettings = {
   ]
 };
 
-function load (basename) {
+function load(basename) {
   const filename = `${__dirname}/fixtures/${basename}.js`;
   return fs.readFileSync(filename, 'utf8');
 }
 
-function collectPositions (ast: Object): Object {
+function collectPositions(ast: Object): Object {
   const collected = {};
   traverse(ast, {
     enter (path) {
       const node = path.node;
       if (path.isFunction()) {
-        if(node.loc) {
+        if (node.loc) {
           collected[JSON.stringify(node.loc)] = extractPath(path.scope);
-        } else if(node.body.loc) {
+        } else if (node.body.loc) {
           collected[JSON.stringify(node.body.loc)] = extractPath(path.scope);
         }
       }
@@ -34,14 +34,14 @@ function collectPositions (ast: Object): Object {
   return collected;
 }
 
-function countHoisted (oldAst, newAst) {
+function countHoisted(oldAst, newAst) {
   const oldPositions = collectPositions(oldAst);
   const newPositions = collectPositions(newAst);
   let total = 0;
   const keys = Object.keys(oldPositions);
   for (let i = 0; i < keys.length; i++) {
     let key = keys[i];
-    if(!newPositions[key]) {
+    if (!newPositions[key]) {
       throw new Error('some missed function');
     }
     if (oldPositions[key] !== newPositions[key]) {
@@ -57,7 +57,7 @@ function needConcatArray(objValue, srcValue) {
   }
 }
 
-function runTest (basename, numberToRemove, expectedResult, settings = defaultBabelSettings) {
+function runTest(basename, numberToRemove, expectedResult, settings = defaultBabelSettings) {
   const source = load(basename);
   const transformedNaked = transform(
     source,
@@ -99,7 +99,7 @@ function runTest (basename, numberToRemove, expectedResult, settings = defaultBa
   }
 }
 
-function eliminate (basename, numberToRemove, result, settings) {
+function eliminate(basename, numberToRemove, result, settings) {
   let settingsName = settings ? ` with settings ${JSON.stringify(settings)}` : '';
   it(`should eliminate ${numberToRemove} closure(s) from "${basename}"${settingsName}`, function () {
     runTest(basename, numberToRemove, result, settings);
@@ -121,7 +121,7 @@ eliminate.only = function (basename: string, numberToRemove: number, result, set
   });
 };
 
-function extractPath (scope) {
+function extractPath(scope) {
   const parts = [];
   do {
     parts.unshift(scope.block.type);
@@ -157,14 +157,16 @@ describe('Closure Elimination', function () {
   eliminate("create-class", 2, ['foo', 'bar']);
   eliminate("create-class", 1, ['foo', 'bar'], {presets: ['babel-preset-es2015-node5']});
   eliminate("create-class", 1, ['foo', 'bar'], {});
-  eliminate("assign-expression", 3, [ 3, 2, "yo", 2, 1 ]);
-  eliminate("assign-expression-and-referenced", 0, [ 1, [ 1, 1 ], [ 123 ] ]);
+  eliminate("assign-expression", 3, [3, 2, "yo", 2, 1]);
+  eliminate("assign-expression-and-referenced", 0, [1, [1, 1], [123]]);
   eliminate("possible-scope-hoisting", 1, [1]);
   eliminate("object-shorthand-func", 3, [1, 2, 3]);
-  eliminate("object-shorthand-func", 1, [1, 2, 3], {plugins:["transform-es2015-destructuring"]});
+  eliminate("object-shorthand-func", 1, [1, 2, 3], {plugins: ["transform-es2015-destructuring"]});
   eliminate("no-function-scope", 1, 'bar');
   eliminate("assign-expression-array-pattern", 0, 2);
   eliminate("eval-deopt", 0, 'bar');
   eliminate("eval-no-deopt", 1, 'bar');
+  eliminate("no-module", 2, 'baz');
+  eliminate("no-module", 1, 'baz', {parserOpts: {sourceType: 'script'}});
 });
 
