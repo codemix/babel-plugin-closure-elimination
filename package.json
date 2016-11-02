@@ -1,6 +1,6 @@
 {
   "name": "babel-plugin-closure-elimination",
-  "version": "1.1.6",
+  "version": "1.1.7",
   "description": "Removes closures from your JavaScript in the name of performance.",
   "main": "lib/index.js",
   "scripts": {
@@ -34,6 +34,7 @@
   "devDependencies": {
     "babel-cli": "^6.4.0",
     "babel-core": "^6.4.0",
+    "babel-generator": "^6.18.0",
     "babel-plugin-syntax-async-functions": "^6.3.13",
     "babel-plugin-transform-es2015-destructuring": "^6.18.0",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.18.0",
@@ -41,6 +42,7 @@
     "babel-plugin-transform-regenerator": "^6.4.4",
     "babel-preset-es2015": "^6.3.13",
     "babel-preset-es2015-node5": "^1.2.0",
+    "babel-preset-latest": "^6.16.0",
     "babel-regenerator-runtime": "^6.3.13",
     "babel-register": "^6.4.3",
     "lodash": "^4.16.5",

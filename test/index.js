@@ -168,5 +168,7 @@ describe('Closure Elimination', function () {
   eliminate("eval-no-deopt", 1, 'bar');
   eliminate("no-module", 2, 'baz');
   eliminate("no-module", 1, 'baz', {parserOpts: {sourceType: 'script'}});
+  // TODO check count of hoisted function. really hoisted 1 function - _callee$
+  eliminate("this-in-async-arrow", 0, undefined, {"presets": ["latest"]});
 });
 

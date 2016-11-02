@@ -1,5 +1,5 @@
 import 'babel-polyfill';
-
+import generate from 'babel-generator';
 /**
  * # Closure Eliminator
  */
@@ -25,7 +25,9 @@ export default function build(babel: Object): Object {
           const bestParentScope = getHighestCompatibleHoistedScope(path);
           if (bestParentScope) {
             const attachPath = getAttachmentPosition(bestParentScope.path, path);
+            // _logAllProgram(path, 'before');// debug
             moveToNewPosition(path, attachPath);
+            // _logAllProgram(path, 'after');// debug
           }
         }
       },
@@ -53,6 +55,7 @@ export default function build(babel: Object): Object {
   };
 
   function getHighestCompatibleHoistedScope(path) {
+    path.scope.crawl();// sibling plugins may not update scope of auto-generated functions
     const parentScopes = getAllParentScopes(path.scope),
       parentBindings = path.scope.parent.getAllBindings();
     for (let id in parentBindings) {
@@ -131,5 +134,12 @@ export default function build(babel: Object): Object {
     else {
       return node;
     }
+  }
+
+  function _logAllProgram(path, label) {
+    var rootNode = path.getAncestry().pop().node;
+    console.error(label);
+    console.error(generate(rootNode).code);
+    console.error('\n=======================================================\n');
   }
 }
