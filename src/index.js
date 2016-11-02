@@ -14,6 +14,9 @@ export default function build(babel: Object): Object {
       Function: {
         exit (path) {
           const {node} = path;
+          if (path.node._hoisted) {
+            return;
+          }
           if (path.isClassMethod() || path.isObjectMethod() || node[$boundArrowFunction] || node[$usedEval]) {
             return;
           }
