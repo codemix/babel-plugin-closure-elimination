@@ -1,5 +1,4 @@
 import 'babel-polyfill';
-import generate from 'babel-generator';
 /**
  * # Closure Eliminator
  */
@@ -139,7 +138,7 @@ export default function build(babel: Object): Object {
   function _logAllProgram(path, label) {
     var rootNode = path.getAncestry().pop().node;
     console.error(label);
-    console.error(generate(rootNode).code);
+    console.error(require('babel-generator')(rootNode).code);
     console.error('\n=======================================================\n');
   }
 }
