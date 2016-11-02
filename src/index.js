@@ -35,8 +35,11 @@ export default function build(babel: Object): Object {
       },
       ThisExpression: {
         enter(path) {
-          path.getAncestry()
-            .filter(path=>path.type === 'ArrowFunctionExpression')
+          var parentFunctions = path.getAncestry()
+              .filter(path=>path.isFunction()),
+            nearestNoArrowFunction = parentFunctions
+              .findIndex(path => path.type !== 'ArrowFunctionExpression');
+          parentFunctions.slice(0, nearestNoArrowFunction)
             .forEach(parentArrow => {
               parentArrow.node[$boundArrowFunction] = true;
             });

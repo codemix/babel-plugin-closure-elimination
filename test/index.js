@@ -141,7 +141,10 @@ describe('Closure Elimination', function () {
   eliminate("inner-2", 3);
   eliminate("nope", 0);
   eliminate("arrow-this", 1);
+  eliminate("arrow-this", 1, undefined, {});
   eliminate("arrow-this-nested", 2);
+  eliminate("arrow-this-nested", 2, undefined, {});
+  eliminate("arrow-this-deep-nested", 3, 222);
   eliminate("class", [1, 1], 'bar');
   eliminate("class", 1, 'bar', {});
   eliminate("declaration", 2);
