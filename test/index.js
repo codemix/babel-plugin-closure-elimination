@@ -149,7 +149,7 @@ describe('Closure Elimination', function () {
   eliminate("no-module", 1, 'baz', {parserOpts: {sourceType: 'script'}});
   eliminate("this-in-async-arrow", [0, 1], undefined, {"presets": ["latest"]});
   eliminate("self-use-declaration", 1, 6, {});
-  eliminate("jquery-3.1.1", 122, undefined, {parserOpts: {sourceType: 'script'}, compact: false});//need only for performance check
+  //eliminate("jquery-3.1.1", 122, undefined, {parserOpts: {sourceType: 'script'}, compact: false});//need only for performance check
   eliminate("same-name-in-parent-scope", 3, ['foo', 'bar'], {});
 });
 
