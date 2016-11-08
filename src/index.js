@@ -104,9 +104,11 @@ export default function build(babel: Object): Object {
     const {node, scope} = path,
       newScope = attachPath.parentPath.scope;
     if (node.type === 'FunctionDeclaration') {
-      let uid = newScope.generateUidIdentifierBasedOnNode(node.id);
-      scope.rename(node.id.name, uid.name);
-      scope.moveBindingTo(uid.name, newScope);
+      if (newScope.bindings[node.id.name]) {
+        const uid = newScope.generateUidIdentifierBasedOnNode(node.id);
+        scope.rename(node.id.name, uid.name);
+      }
+      scope.moveBindingTo(node.id.name, newScope);
       node._hoisted = true;
       attachPath.insertBefore([node]);
       path.remove();
