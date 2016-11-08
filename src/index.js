@@ -64,21 +64,30 @@ export default function build(babel: Object): Object {
     const parentScopes = getAllParentScopes(path.scope),
       parentBindings = path.scope.parent.getAllBindings();
     for (let id in parentBindings) {
+      const parentBinding = parentBindings[id],
+        idx = parentScopes.indexOf(parentBinding.scope);
+      if (idx === -1) {
+        continue;
+      }
       let hasUsageOfBinding = []
-        .concat(parentBindings[id].referencePaths)
-        .concat(parentBindings[id].constantViolations)
-        .some(subPath => subPath.getAncestry().indexOf(path) !== -1);
+        .concat(parentBinding.referencePaths)
+        .concat(parentBinding.constantViolations)
+        .some(hasInPath);
       if (hasUsageOfBinding) {
-        let idx = parentScopes.indexOf(parentBindings[id].scope);
-        if (idx !== -1) {
-          parentScopes.splice(idx + 1, Infinity);
-        }
+        parentScopes.splice(idx + 1, Infinity);
       }
     }
     return parentScopes
       .filter(({path}) => !path.isProgram() || path.node.sourceType === 'module')
       .filter(scope => scope !== path.scope.parent)
       .pop();
+    function hasInPath(subPath) {
+      while (subPath = subPath.parentPath) {
+        if (subPath === path) {
+          return true;
+        }
+      }
+    }
   }
 
   function getAllParentScopes(scope) {
