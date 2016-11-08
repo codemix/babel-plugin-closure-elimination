@@ -117,6 +117,9 @@ export default function build(babel: Object): Object {
           node.params,
           normalizeFunctionBody(node.body)
         );
+      if(node.id && node.id.name) {
+        scope.rename(node.id.name, uid.name);
+      }
       replacement.loc = node.loc;
       replacement.generator = node.generator;
       replacement.async = node.async;
@@ -144,7 +147,7 @@ export default function build(babel: Object): Object {
   function _logAllProgram(path, label) {
     var rootNode = path.getAncestry().pop().node;
     console.error(label);
-    console.error(require('babel-generator')(rootNode).code);
+    console.error(require('babel-generator').default(rootNode).code);
     console.error('\n=======================================================\n');
   }
 }
