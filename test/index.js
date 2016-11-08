@@ -78,7 +78,7 @@ function runTest(basename, numberToRemove, expectedResult, settings = defaultBab
 function eliminate(basename, numberToRemove, result, settings) {
   let settingsName = settings ? ` with settings ${JSON.stringify(settings)}` : '';
   it(`should eliminate ${numberToRemove} closure(s) from "${basename}"${settingsName}`, function () {
-    this.timeout(100 * 1000);
+    this.timeout(15 * 1000);
     runTest(basename, numberToRemove, result, settings);
   });
 }
@@ -86,7 +86,7 @@ function eliminate(basename, numberToRemove, result, settings) {
 eliminate.only = function (basename: string, numberToRemove: number, result, settings) {
   let settingsName = settings ? ` with settings ${JSON.stringify(settings)}` : '';
   it.only(`should eliminate ${numberToRemove} closure(s) from "${basename}"${settingsName}`, function () {
-    this.timeout(100 * 1000);
+    this.timeout(15 * 1000);
     try {
       runTest(basename, numberToRemove, result, settings);
     }

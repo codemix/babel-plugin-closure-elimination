@@ -117,16 +117,20 @@ export default function build(babel: Object): Object {
           node.params,
           normalizeFunctionBody(node.body)
         );
-      if(node.id && node.id.name) {
+      if (node.id && node.id.name) {
         scope.rename(node.id.name, uid.name);
+        scope.moveBindingTo(node.id.name, newScope);
       }
       replacement.loc = node.loc;
       replacement.generator = node.generator;
       replacement.async = node.async;
       replacement._hoisted = true;
-      attachPath.insertBefore([replacement]);
+      const declarePath = attachPath.insertBefore([replacement])[0];
       path.replaceWith(t.identifier(uid.name));
-      newScope.crawl();
+      if (!newScope.bindings[uid.name]) {
+        newScope.registerDeclaration(declarePath);
+      }
+      newScope.bindings[uid.name].reference(path);
     }
   }
 
