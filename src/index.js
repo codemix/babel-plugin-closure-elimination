@@ -66,21 +66,30 @@ export default function build(babel: Object): Object {
     const parentScopes = getAllParentScopes(path.scope),
       parentBindings = path.scope.parent.getAllBindings();
     for (let id in parentBindings) {
+      const parentBinding = parentBindings[id],
+        idx = parentScopes.indexOf(parentBinding.scope);
+      if (idx === -1) {
+        continue;
+      }
       let hasUsageOfBinding = []
-        .concat(parentBindings[id].referencePaths)
-        .concat(parentBindings[id].constantViolations)
-        .some(subPath => subPath.getAncestry().indexOf(path) !== -1);
+        .concat(parentBinding.referencePaths)
+        .concat(parentBinding.constantViolations)
+        .some(hasInPath);
       if (hasUsageOfBinding) {
-        let idx = parentScopes.indexOf(parentBindings[id].scope);
-        if (idx !== -1) {
-          parentScopes.splice(idx + 1, Infinity);
-        }
+        parentScopes.splice(idx + 1, Infinity);
       }
     }
     return parentScopes
       .filter(({path}) => !path.isProgram() || path.node.sourceType === 'module')
       .filter(scope => scope !== path.scope.parent)
       .pop();
+    function hasInPath(subPath) {
+      while (subPath = subPath.parentPath) {
+        if (subPath === path) {
+          return true;
+        }
+      }
+    }
   }
 
   function getAllParentScopes(scope) {
@@ -110,9 +119,11 @@ export default function build(babel: Object): Object {
     const {node, scope} = path,
       newScope = attachPath.parentPath.scope;
     if (node.type === 'FunctionDeclaration') {
-      let uid = newScope.generateUidIdentifierBasedOnNode(node.id);
-      scope.rename(node.id.name, uid.name);
-      scope.moveBindingTo(uid.name, newScope);
+      if (newScope.bindings[node.id.name]) {
+        const uid = newScope.generateUidIdentifierBasedOnNode(node.id);
+        scope.rename(node.id.name, uid.name);
+      }
+      scope.moveBindingTo(node.id.name, newScope);
       node._hoisted = true;
       attachPath.insertBefore([node]);
       path.remove();
@@ -125,14 +136,18 @@ export default function build(babel: Object): Object {
         );
       if (node.id && node.id.name) {
         scope.rename(node.id.name, uid.name);
+        scope.moveBindingTo(node.id.name, newScope);
       }
       replacement.loc = node.loc;
       replacement.generator = node.generator;
       replacement.async = node.async;
       replacement._hoisted = true;
-      attachPath.insertBefore([replacement]);
+      const declarePath = attachPath.insertBefore([replacement])[0];
       path.replaceWith(t.identifier(uid.name));
-      newScope.crawl();
+      if (!newScope.bindings[uid.name]) {
+        newScope.registerDeclaration(declarePath);
+      }
+      newScope.bindings[uid.name].reference(path);
     }
   }
 
