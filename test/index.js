@@ -175,5 +175,6 @@ describe('Closure Elimination', function () {
   eliminate("no-module", 1, 'baz', {parserOpts: {sourceType: 'script'}});
   eliminate("this-in-async-arrow", [0, 1], undefined, {"presets": ["latest"]});
   eliminate("self-use-declaration", 1, 6, {});
+  eliminate("no-block-statement", 0, [["foo","bar"],"bar1"], {});
 });
 
