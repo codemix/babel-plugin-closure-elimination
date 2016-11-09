@@ -27,9 +27,11 @@ export default function build(babel: Object): Object {
           const bestParentScope = getHighestCompatibleHoistedScope(path);
           if (bestParentScope) {
             const attachPath = getAttachmentPosition(bestParentScope.path, path);
-            // _logAllProgram(path, 'before');// debug
-            moveToNewPosition(path, attachPath);
-            // _logAllProgram(path, 'after');// debug
+            if (attachPath) {
+              // _logAllProgram(path, 'before');// debug
+              moveToNewPosition(path, attachPath);
+              // _logAllProgram(path, 'after');// debug
+            }
           }
         }
       },
@@ -99,14 +101,18 @@ export default function build(babel: Object): Object {
   }
 
   function getAttachmentPosition(bestParent, prevPath) {
-    let possibleSiblings;
-    if (bestParent.isFunction()) {
-      possibleSiblings = bestParent.get('body.body');
-    } else if (bestParent.isProgram() || bestParent.isBlockStatement()) {
-      possibleSiblings = bestParent.get('body');
+    const prevParents = prevPath.getAncestry(),
+      bestParentIdx = prevParents.indexOf(bestParent);
+    if (-1 === bestParentIdx) {
+      throw new Error('Possible parent not really in ancestry');
     }
-    const prevParents = prevPath.getAncestry();
-    return possibleSiblings.find(x => prevParents.indexOf(x) !== -1);
+    return prevParents
+      .slice(1, bestParentIdx)
+      .reverse()
+      .find(
+        path => (path.parentPath.isBlockStatement() || path.parentPath.isProgram()) &&
+          path.parentPath.scope !== prevPath.parentPath.scope
+      );
   }
 
   function moveToNewPosition(path, attachPath) {
