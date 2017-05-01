@@ -141,7 +141,7 @@ describe('Closure Elimination', function () {
   eliminate("possible-scope-hoisting", 1, [1]);
   eliminate("object-shorthand-func", [1, 2], [1, 2, 3]);
   eliminate("object-shorthand-func", 1, [1, 2, 3], {plugins: ["transform-es2015-destructuring"]});
-  eliminate("no-function-scope", [1, 1], 'bar');
+  eliminate("no-function-scope", [1, 0], 'bar');
   eliminate("assign-expression-array-pattern", 0, 2);
   eliminate("eval-deopt", 0, 'bar');
   eliminate("eval-no-deopt", 1, 'bar');
