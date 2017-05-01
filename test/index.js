@@ -154,5 +154,6 @@ describe('Closure Elimination', function () {
   eliminate("same-name-in-parent-scope", 3, ['foo', 'bar'], {});
   eliminate("issue-25", [1, 2]);
   eliminate("issue-25", 1, null, {});
+  eliminate("issue-25", 1, null, {plugins:["transform-async-to-generator"]});
 });
 
