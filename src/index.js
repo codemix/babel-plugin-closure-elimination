@@ -14,6 +14,7 @@ export default function build(babel: Object): Object {
       Function: {
         exit (path) {
           const {node} = path;
+          path.scope.crawl();// sibling plugins may not update scope of auto-generated functions
           if (path.node._hoisted) {
             return;
           }
@@ -62,7 +63,6 @@ export default function build(babel: Object): Object {
   };
 
   function getHighestCompatibleHoistedScope(path) {
-    path.scope.crawl();// sibling plugins may not update scope of auto-generated functions
     const parentScopes = getAllParentScopes(path.scope),
       parentBindings = path.scope.parent.getAllBindings();
     for (let id in parentBindings) {
