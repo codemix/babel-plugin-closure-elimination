@@ -155,5 +155,7 @@ describe('Closure Elimination', function () {
   eliminate("issue-25", [1, 2]);
   eliminate("issue-25", 1, null, {});
   eliminate("issue-25", [1, 1], null, {plugins:["transform-async-to-generator"]});
+  eliminate("issue-26", [1, 1], ['foo', 'bar']);
+  eliminate("issue-26", 1, ['foo', 'bar'], {});
 });
 
