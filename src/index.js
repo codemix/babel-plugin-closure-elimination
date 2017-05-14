@@ -135,6 +135,10 @@ export default function build(babel: Object): Object {
           normalizeFunctionBody(node.body)
         );
       if (node.id && node.id.name) {
+        // fix for auto-generated named expression function, when node.id duplicated in AST in outer VariableDeclaration
+        node.id = t.cloneDeep(node.id);
+        scope.crawl();
+
         scope.rename(node.id.name, uid.name);
         scope.moveBindingTo(node.id.name, newScope);
       }
