@@ -30,21 +30,23 @@ function _foo() {
   return _ref();
 }
 
+function _ref2() {
+  function Demo(url) {
+    _classCallCheck(this, Demo);
+
+    this.url = url;
+  }
+
+  _createClass(Demo, [{
+    key: "foo",
+    value: _foo
+  }]);
+
+  return Demo;
+}
+
 function demo() {
-  var Demo = function () {
-    function Demo(url) {
-      _classCallCheck(this, Demo);
-
-      this.url = url;
-    }
-
-    _createClass(Demo, [{
-      key: "foo",
-      value: _foo
-    }]);
-
-    return Demo;
-  }();
+  var Demo = _ref2();
 
   return new Demo().foo();
 }

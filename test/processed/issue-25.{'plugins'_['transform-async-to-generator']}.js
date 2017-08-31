@@ -29,7 +29,7 @@ function _asyncToGenerator(fn) {
 
 function* _ref2() {}
 
-function _ref3() {
+function _ref() {
   var _ref = _asyncToGenerator(_ref2);
 
   return function charlie() {
@@ -40,7 +40,7 @@ function _ref3() {
 function alpha() {
   return {
     bravo() {
-      let charlie = _ref3();
+      let charlie = _ref();
     }
   };
 }

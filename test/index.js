@@ -127,13 +127,13 @@ describe('Closure Elimination', function () {
   eliminate("arrow-this-nested", 2);
   eliminate("arrow-this-nested", 2, undefined, {});
   eliminate("arrow-this-deep-nested", 3, 222);
-  eliminate("class", [1, 1], 'bar');
+  eliminate("class", [1, 2], 'bar');
   eliminate("class", 1, 'bar', {});
   eliminate("declaration", 2);
   eliminate("shadow-declaration", 2);
   eliminate("iife", 0);
   eliminate("class-compiled", 4);
-  eliminate("class-complex", [2, 1], [2, 3, 4]);
+  eliminate("class-complex", [2, 2], [2, 3, 4]);
   eliminate("class-complex", 2, [2, 3, 4], {});
   eliminate("extended-class-from-outer-parent", [2, 2], [["foo", Date.prototype.getDate], ["bar", Date.prototype.getDate]]);
   eliminate("extended-class-from-outer-parent", 2, [["foo", Date.prototype.getDate], ["bar", Date.prototype.getDate]], {});
@@ -141,7 +141,7 @@ describe('Closure Elimination', function () {
   eliminate("extended-class-from-known-class", 2, [["base", "foo"], ["base", "bar"]], {});
   eliminate("generator", 1, ["foo", 1, 2, 3]);
   eliminate("async", [1, 1], true);
-  eliminate("create-class", [1, 1], ['foo', 'bar']);
+  eliminate("create-class", [1, 2], ['foo', 'bar']);
   eliminate("create-class", 1, ['foo', 'bar'], {presets: ['babel-preset-es2015-node5']});
   eliminate("create-class", 1, ['foo', 'bar'], {});
   eliminate("assign-expression", [2, 0], [3, 2, "yo", 2, 1]);
@@ -165,5 +165,6 @@ describe('Closure Elimination', function () {
   eliminate("issue-25", [1, 1], null, {plugins:["transform-async-to-generator"]});
   eliminate("issue-26", [1, 1], ['foo', 'bar']);
   eliminate("issue-26", 1, ['foo', 'bar'], {});
+  eliminate("issue-28-minimal", 1, [0, 1], {"plugins": ['transform-regenerator']});
 });
 

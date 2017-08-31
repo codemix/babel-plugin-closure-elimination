@@ -34,21 +34,23 @@ function _someMethod() {
   return this.items.map(_ref).map(_ref2);
 }
 
+function _ref3() {
+  function Demo(items) {
+    _classCallCheck(this, Demo);
+
+    this.items = items;
+  }
+
+  _createClass(Demo, [{
+    key: "someMethod",
+    value: _someMethod
+  }]);
+
+  return Demo;
+}
+
 function demo() {
-  var Demo = function () {
-    function Demo(items) {
-      _classCallCheck(this, Demo);
-
-      this.items = items;
-    }
-
-    _createClass(Demo, [{
-      key: "someMethod",
-      value: _someMethod
-    }]);
-
-    return Demo;
-  }();
+  var Demo = _ref3();
 
   return new Demo([0, 1, 2]).someMethod();
 }

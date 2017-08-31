@@ -14,7 +14,8 @@ export default function build(babel: Object): Object {
       Function: {
         exit (path) {
           const {node} = path;
-          path.scope.crawl();// sibling plugins may not update scope of auto-generated functions
+          // path.scope.crawl();// sibling plugins may not update scope of auto-generated functions
+          getAllParentScopes(path.scope).forEach(scope => scope.crawl());//TODO more optimal?
           if (path.node._hoisted) {
             return;
           }

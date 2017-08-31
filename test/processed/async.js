@@ -5,7 +5,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = demo;
 
-function _ref$2(_context) {
+function _ref$(_context) {
   while (1) {
     switch (_context.prev = _context.next) {
       case 0:
@@ -20,7 +20,7 @@ function _ref$2(_context) {
 }
 
 function _ref() {
-  return regeneratorRuntime.async(_ref$2, null, this);
+  return regeneratorRuntime.async(_ref$, null, this);
 }
 
 function asyncF() {

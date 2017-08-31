@@ -30,21 +30,23 @@ function _f() {
   return [_ref(), this.a];
 }
 
+function _ref2() {
+  function C(a) {
+    _classCallCheck(this, C);
+
+    this.a = a;
+  }
+
+  _createClass(C, [{
+    key: 'f',
+    value: _f
+  }]);
+
+  return C;
+}
+
 function createClass() {
-  var C = function () {
-    function C(a) {
-      _classCallCheck(this, C);
-
-      this.a = a;
-    }
-
-    _createClass(C, [{
-      key: 'f',
-      value: _f
-    }]);
-
-    return C;
-  }();
+  var C = _ref2();
 
   return new C('bar').f();
 }

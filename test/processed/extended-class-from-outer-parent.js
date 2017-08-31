@@ -68,16 +68,16 @@ function _foo2() {
   return [this.bar(), this.getDate];
 }
 
-var Demo2 = function (_Date2) {
-  _inherits(Demo2, _Date2);
+var Demo2 = function (_Date) {
+  _inherits(Demo2, _Date);
 
   function Demo2() {
     _classCallCheck(this, Demo2);
 
-    var _this2 = _possibleConstructorReturn(this, (Demo2.__proto__ || Object.getPrototypeOf(Demo2)).call(this));
+    var _this = _possibleConstructorReturn(this, (Demo2.__proto__ || Object.getPrototypeOf(Demo2)).call(this));
 
-    _this2.bar = _ref2;
-    return _this2;
+    _this.bar = _ref2;
+    return _this;
   }
 
   _createClass(Demo2, [{

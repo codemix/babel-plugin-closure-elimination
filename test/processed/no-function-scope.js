@@ -5,12 +5,13 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = demo;
 function demo() {
-    function _ref() {
-        return bar;
-    }
-
     if (true) {
         var bar = 'bar';
+
+        function _ref() {
+            return bar;
+        }
+
         if (true) {
             var foo = _ref;
             return foo();
