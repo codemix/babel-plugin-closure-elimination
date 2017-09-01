@@ -14,8 +14,6 @@ export default function build(babel: Object): Object {
       Function: {
         exit (path) {
           const {node} = path;
-          // path.scope.crawl();// sibling plugins may not update scope of auto-generated functions
-          getAllParentScopes(path.scope).forEach(scope => scope.crawl());//TODO more optimal?
           if (path.node._hoisted) {
             return;
           }
@@ -64,41 +62,40 @@ export default function build(babel: Object): Object {
   };
 
   function getHighestCompatibleHoistedScope(path) {
-    const parentScopes = getAllParentScopes(path.scope),
-      parentBindings = path.scope.parent.getAllBindings();
-    for (let id in parentBindings) {
-      const parentBinding = parentBindings[id],
-        idx = parentScopes.indexOf(parentBinding.scope);
-      if (idx === -1) {
-        continue;
-      }
-      let hasUsageOfBinding = []
-        .concat(parentBinding.referencePaths)
-        .concat(parentBinding.constantViolations)
-        .some(hasInPath);
-      if (hasUsageOfBinding) {
-        parentScopes.splice(idx + 1, Infinity);
-      }
-    }
-    return parentScopes
-      .filter(({path}) => !path.isProgram() || path.node.sourceType === 'module')
-      .filter(scope => scope !== path.scope.parent)
-      .pop();
-    function hasInPath(subPath) {
-      while (subPath = subPath.parentPath) {
-        if (subPath === path) {
-          return true;
-        }
-      }
+    const scope = getNearestScopeWithLocalUsedVars(path, path.scope.getProgramParent().path.node.sourceType !== 'module');
+    if(scope !== path.scope.parent) {
+      return scope;
     }
   }
 
-  function getAllParentScopes(scope) {
-    var scopes = [];
-    while (scope = scope.parent) {
-      scopes.push(scope);
-    }
-    return scopes;
+
+  function getNearestScopeWithLocalUsedVars(path, disableRoot = false) {
+    let scope = path.scope,
+      rootScope = path.scope.getProgramParent();
+    scope.crawl();
+    do {
+      scope = scope.parent;
+      scope.crawl();
+      const bindings = scope.getAllBindings();
+      for(const id in bindings) {
+        if(!scope.hasOwnBinding(id)) {
+          break;
+        }
+        const references = []
+            .concat(bindings[id].referencePaths)
+            .concat(bindings[id].constantViolations),
+          usedReferences = references
+            .filter((refPath) => refPath.isDescendant(path))
+        ;
+        if(usedReferences.length) {
+          return scope;
+        }
+      }
+      if(disableRoot && scope.parent === rootScope) {
+        return scope;
+      }
+    } while(scope.parent);
+    return scope;
   }
 
   function getAttachmentPosition(bestParent, prevPath) {

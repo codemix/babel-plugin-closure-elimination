@@ -30,7 +30,7 @@ function _asyncToGenerator(fn) {
 function demo() {
     var _this = this;
 
-    function _callee$(_context) {
+    function _callee$2(_context) {
         while (1) {
             switch (_context.prev = _context.next) {
                 case 0:
@@ -48,6 +48,6 @@ function demo() {
     }
 
     call(_asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
-        return regeneratorRuntime.wrap(_callee$, _callee, _this);
+        return regeneratorRuntime.wrap(_callee$2, _callee, _this);
     })));
 }
