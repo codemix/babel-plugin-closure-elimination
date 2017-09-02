@@ -11,51 +11,59 @@ export default function build(babel: Object): Object {
 
   return {
     visitor: {
-      Function: {
-        exit (path) {
-          const {node} = path;
-          if (path.node._hoisted) {
-            return;
-          }
-          if (path.isClassMethod() || path.isObjectMethod() || node[$boundArrowFunction] || node[$usedEval]) {
-            return;
-          }
-          if (path.findParent(({node}) => node._generated || node._compact)) {
-            path.skip();
-            return;
-          }
-          const bestParentScope = getHighestCompatibleHoistedScope(path);
-          if (bestParentScope) {
-            const attachPath = getAttachmentPosition(bestParentScope.path, path);
-            if (attachPath) {
-              // _logAllProgram(path, 'before');// debug
-              moveToNewPosition(path, attachPath);
-              // _logAllProgram(path, 'after');// debug
+      Program: {
+        exit(path) {
+          babel.traverse.clearCache()
+          path.scope.crawl();
+          path.traverse({
+            Function: {
+              exit (path) {
+                const {node} = path;
+                if (path.node._hoisted) {
+                  return;
+                }
+                if (path.isClassMethod() || path.isObjectMethod() || node[$boundArrowFunction] || node[$usedEval]) {
+                  return;
+                }
+                if (path.findParent(({node}) => node._generated || node._compact)) {
+                  path.skip();
+                  return;
+                }
+                const bestParentScope = getHighestCompatibleHoistedScope(path);
+                if (bestParentScope) {
+                  const attachPath = getAttachmentPosition(bestParentScope.path, path);
+                  if (attachPath) {
+                    // _logAllProgram(path, 'before');// debug
+                    moveToNewPosition(path, attachPath);
+                    // _logAllProgram(path, 'after');// debug
+                  }
+                }
+              }
+            },
+            ThisExpression: {
+              enter(path) {
+                var parentFunctions = path.getAncestry()
+                    .filter(path=>path.isFunction()),
+                  nearestNoArrowFunction = parentFunctions
+                    .findIndex(path => path.type !== 'ArrowFunctionExpression');
+                parentFunctions.slice(0, nearestNoArrowFunction)
+                  .forEach(parentArrow => {
+                    parentArrow.node[$boundArrowFunction] = true;
+                  });
+              }
+            },
+            Identifier: {
+              enter(path) {
+                if (path.node.name === 'eval' && path.parentPath.type === 'CallExpression') {
+                  path.getAncestry()
+                    .filter(path=>path.isFunction())
+                    .forEach(parentArrow => {
+                      parentArrow.node[$usedEval] = true;
+                    });
+                }
+              }
             }
-          }
-        }
-      },
-      ThisExpression: {
-        enter(path) {
-          var parentFunctions = path.getAncestry()
-              .filter(path=>path.isFunction()),
-            nearestNoArrowFunction = parentFunctions
-              .findIndex(path => path.type !== 'ArrowFunctionExpression');
-          parentFunctions.slice(0, nearestNoArrowFunction)
-            .forEach(parentArrow => {
-              parentArrow.node[$boundArrowFunction] = true;
-            });
-        }
-      },
-      Identifier: {
-        enter(path) {
-          if (path.node.name === 'eval' && path.parentPath.type === 'CallExpression') {
-            path.getAncestry()
-              .filter(path=>path.isFunction())
-              .forEach(parentArrow => {
-                parentArrow.node[$usedEval] = true;
-              });
-          }
+          });
         }
       }
     }
@@ -72,10 +80,8 @@ export default function build(babel: Object): Object {
   function getNearestScopeWithLocalUsedVars(path, disableRoot = false) {
     let scope = path.scope,
       rootScope = path.scope.getProgramParent();
-    scope.crawl();
     do {
       scope = scope.parent;
-      scope.crawl();
       const bindings = scope.getAllBindings();
       for(const id in bindings) {
         if(!scope.hasOwnBinding(id)) {

@@ -12,9 +12,9 @@ function demo() {
   return iterator.next().value()();
 }
 function generator() {
-  var value, _ref, fn;
+  var value, fn;
 
-  function _ref2() {
+  function _ref() {
     return [value, 'bar'];
   }
 
@@ -26,14 +26,13 @@ function generator() {
     while (1) {
       switch (_context.prev = _context.next) {
         case 0:
-          _ref = _ref2;
           value = 'foo'; //bug, when used this variable
 
           fn = _fn;
-          _context.next = 5;
+          _context.next = 4;
           return fn;
 
-        case 5:
+        case 4:
         case 'end':
           return _context.stop();
       }

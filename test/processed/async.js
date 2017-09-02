@@ -5,7 +5,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = demo;
 
-function _ref$(_context) {
+function _callee$2(_context) {
   while (1) {
     switch (_context.prev = _context.next) {
       case 0:
@@ -19,12 +19,12 @@ function _ref$(_context) {
   }
 }
 
-function _ref() {
-  return regeneratorRuntime.async(_ref$, null, this);
+function _callee2() {
+  return regeneratorRuntime.async(_callee$2, null, this);
 }
 
 function asyncF() {
-  return _ref;
+  return _callee2;
 }
 
 function demo() {

@@ -8,12 +8,12 @@ function demo() {
     if (true) {
         var bar = 'bar';
 
-        function _ref() {
+        function _foo() {
             return bar;
         }
 
         if (true) {
-            var foo = _ref;
+            var foo = _foo;
             return foo();
         }
     }

@@ -5,10 +5,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = demo;
 
-var _marked = /*#__PURE__*/regeneratorRuntime.mark(_ref);
-
-function _ref(arg) {
-  return regeneratorRuntime.wrap(function _ref$(_context) {
+function _callee2(arg) {
+  return regeneratorRuntime.wrap(function _callee$(_context) {
     while (1) {
       switch (_context.prev = _context.next) {
         case 0:
@@ -32,11 +30,12 @@ function _ref(arg) {
           return _context.stop();
       }
     }
-  }, _marked, this);
+  }, _callee2, this);
 }
 
 function generateF() {
-  return _ref;
+  return (/*#__PURE__*/regeneratorRuntime.mark(_callee2)
+  );
 }
 
 function demo() {

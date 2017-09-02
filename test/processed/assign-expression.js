@@ -5,7 +5,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = demo;
 
-function _ref() {
+function _refFunc() {
   return "yo";
 }
 
@@ -17,7 +17,7 @@ function bar() {
     s = 2;
     return s;
   };
-  var refFunc = _ref;
+  var refFunc = _refFunc;
   return [s, func(), refFunc(), s];
 }
 function foo() {

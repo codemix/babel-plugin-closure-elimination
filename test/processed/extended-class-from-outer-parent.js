@@ -34,12 +34,12 @@ function _inherits(subClass, superClass) {
   }subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
 }
 
-function _ref() {
+function _tmp() {
   return "foo";
 }
 
 function _foo() {
-  var tmp = _ref;
+  var tmp = _tmp;
   return [tmp(), this.getDate];
 }
 
@@ -60,7 +60,7 @@ var Demo1 = function (_Date) {
   return Demo1;
 }(Date);
 
-function _ref2() {
+function _ref() {
   return "bar";
 }
 
@@ -68,16 +68,16 @@ function _foo2() {
   return [this.bar(), this.getDate];
 }
 
-var Demo2 = function (_Date) {
-  _inherits(Demo2, _Date);
+var Demo2 = function (_Date2) {
+  _inherits(Demo2, _Date2);
 
   function Demo2() {
     _classCallCheck(this, Demo2);
 
-    var _this = _possibleConstructorReturn(this, (Demo2.__proto__ || Object.getPrototypeOf(Demo2)).call(this));
+    var _this2 = _possibleConstructorReturn(this, (Demo2.__proto__ || Object.getPrototypeOf(Demo2)).call(this));
 
-    _this.bar = _ref2;
-    return _this;
+    _this2.bar = _ref;
+    return _this2;
   }
 
   _createClass(Demo2, [{

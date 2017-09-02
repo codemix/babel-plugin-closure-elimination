@@ -124,7 +124,7 @@ describe('Closure Elimination', function () {
   eliminate("nope", 0);
   eliminate("arrow-this", 1);
   eliminate("arrow-this", 1, undefined, {});
-  eliminate("arrow-this-nested", 2);
+  eliminate("arrow-this-nested", 3);
   eliminate("arrow-this-nested", 2, undefined, {});
   eliminate("arrow-this-deep-nested", 3, 222);
   eliminate("class", [1, 2], 'bar');
@@ -163,7 +163,7 @@ describe('Closure Elimination', function () {
   eliminate("issue-25", [1, 2]);
   eliminate("issue-25", 1, null, {});
   eliminate("issue-25", [1, 1], null, {plugins:["transform-async-to-generator"]});
-  eliminate("issue-26", [1, 1], ['foo', 'bar']);
+  eliminate("issue-26", [2, 0], ['foo', 'bar']);
   eliminate("issue-26", 1, ['foo', 'bar'], {});
   eliminate("issue-28-minimal", 1, [0, 1], {"plugins": ['transform-regenerator']});
 });

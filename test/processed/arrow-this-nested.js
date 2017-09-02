@@ -10,9 +10,11 @@ function nestedHoistable() {
 function demo(input) {
   var _this = this;
 
+  function _ref2(wat) {
+    return wat + 2 + _this.id + nestedHoistable();
+  }
+
   return input.map(_ref).map(function (item) {
-    return function (wat) {
-      return wat + 2 + _this.id + nestedHoistable();
-    };
+    return _ref2;
   });
 }
