@@ -156,7 +156,7 @@ describe('Closure Elimination', function () {
   eliminate("no-module", 2, 'baz');
   eliminate("no-module", 1, 'baz', {parserOpts: {sourceType: 'script'}});
   eliminate("this-in-async-arrow", [0, 1], undefined, {"presets": ["latest"]});
-  eliminate("self-use-declaration", 2, [6, 6], {});
+  eliminate("self-use-declaration", 2, [6, 6, 6], {});
   eliminate("no-block-statement", 0, [["foo","bar"],"bar1"], {});
   //eliminate("jquery-3.1.1", 122, undefined, {parserOpts: {sourceType: 'script'}, compact: false});//need only for performance check
   eliminate("same-name-in-parent-scope", 3, ['foo', 'bar'], {});
@@ -166,5 +166,6 @@ describe('Closure Elimination', function () {
   eliminate("issue-26", [2, 0], ['foo', 'bar']);
   eliminate("issue-26", 1, ['foo', 'bar'], {});
   eliminate("issue-28-minimal", 1, [0, 1], {"plugins": ['transform-regenerator']});
+  eliminate("conditional-function", 4, ['a1', 'a2', 'e1', 'e2']);
 });
 
