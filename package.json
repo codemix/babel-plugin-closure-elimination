@@ -32,6 +32,7 @@
     "babel-polyfill": "^6.3.14"
   },
   "devDependencies": {
+    "babel-preset-env": "^1.6.0",
     "babel-preset-es2015-node5": "^1.2.0",
     "babel-regenerator-runtime": "^6.3.13",
     "lodash": "^4.16.5",
