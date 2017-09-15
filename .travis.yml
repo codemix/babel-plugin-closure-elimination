@@ -4,6 +4,13 @@ node_js:
   - "5"
   - "6"
   - "7"
+  - "8"
+env:
+  - BABEL_VERSION="6"
+  - BABEL_VERSION="7.0.0-beta.0"
+before_install:
+  - npm install babel-cli@^"$BABEL_VERSION" babel-core@^"$BABEL_VERSION" babel-generator@^"$BABEL_VERSION" babel-plugin-syntax-async-functions@^"$BABEL_VERSION" babel-plugin-transform-async-to-generator@^"$BABEL_VERSION" babel-plugin-transform-es2015-destructuring@^"$BABEL_VERSION" babel-plugin-transform-es2015-modules-commonjs@^"$BABEL_VERSION" babel-plugin-transform-flow-strip-types@^"$BABEL_VERSION" babel-plugin-transform-regenerator@^"$BABEL_VERSION" babel-preset-es2015@^"$BABEL_VERSION" babel-preset-latest@^"$BABEL_VERSION" babel-register@^"$BABEL_VERSION"
+
 cache:
   directories:
     - node_modules
