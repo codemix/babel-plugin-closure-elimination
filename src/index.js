@@ -13,7 +13,11 @@ export default function build(babel: Object): Object {
     visitor: {
       Program: {
         exit(path) {
-          babel.traverse.clearCache()
+          if (babel.traverse.cache) {
+            babel.traverse.cache.clear()
+          } else {
+            babel.traverse.clearCache()
+          }
           path.scope.crawl();
           path.traverse({
             Function: {
