@@ -1,6 +1,7 @@
-.idea
-test
-test-polyfill.js
-.npmignore
-.travis.yml
-.babelrc
+/.idea
+/test
+/test-polyfill.js
+/.npmignore
+/.travis.yml
+/.babelrc
+/src

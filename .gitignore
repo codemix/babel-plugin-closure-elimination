@@ -1,4 +1,4 @@
-.settings
-node_modules
-lib
+/.settings
+/node_modules
+/lib
 /.idea

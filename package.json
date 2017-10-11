@@ -5,7 +5,7 @@
   "main": "lib/index.js",
   "scripts": {
     "build": "babel -d ./lib ./src",
-    "build-eliminated": "cd src && babel --plugins ../lib -d ./lib ./",
+    "build-eliminated": "cd src && babel --plugins ../lib -d ../lib ./",
     "prepublish": "npm run test",
     "pretest": "npm run build && npm run build-eliminated",
     "test": "mocha test/index.js",
