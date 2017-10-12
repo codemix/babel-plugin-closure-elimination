@@ -6,7 +6,7 @@
   "scripts": {
     "build": "babel -d ./lib ./src",
     "build-eliminated": "cd src && babel --plugins ../lib -d ../lib ./",
-    "prepublish": "npm run test",
+    "prepublishOnly": "npm run test",
     "pretest": "npm run build && npm run build-eliminated",
     "test": "mocha test/index.js",
     "watch": "mocha --watch"
@@ -43,10 +43,10 @@
     "babel-preset-env": "^1.6.0",
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-es2015-node5": "^1.2.0",
-    "babel-regenerator-runtime": "^6.3.13",
+    "babel-regenerator-runtime": "^6.5.0",
     "babel-register": "^6.26.0",
-    "lodash": "^4.16.5",
-    "mocha": "^2.2.4",
-    "should": "^6.0.1"
+    "lodash": "^4.17.4",
+    "mocha": "^4.0.1",
+    "should": "^13.1.2"
   }
 }
